@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -10,96 +10,112 @@ import { Star, Clock, MapPin, Info } from 'lucide-react';
 // Mock restaurant data
 const mockRestaurant = {
   id: '1',
-  name: 'Burger Palace',
-  description: 'Home of the juiciest burgers in town. We use 100% premium beef and fresh ingredients.',
-  coverImage: 'https://images.unsplash.com/photo-1555992336-fb0d29498b13?q=80&w=2070',
-  logo: 'https://images.unsplash.com/photo-1586816001966-79b736744398?q=80&w=1470',
-  cuisine: ['American', 'Fast Food', 'Burgers'],
-  rating: 4.5,
-  reviewCount: 324,
+  name: 'Spice Garden',
+  description: 'Authentic Indian cuisine with flavors that will transport you to the streets of Delhi.',
+  coverImage: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070',
+  logo: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=200',
+  cuisine: ['Indian', 'North Indian', 'South Indian'],
+  rating: 4.7,
+  reviewCount: 487,
   deliveryTime: '25-30 min',
-  distance: '1.2 km',
+  distance: '1.8 km',
   priceRange: '$$',
-  address: '123 Burger Street, Foodville',
-  openingHours: '10:00 AM - 10:00 PM',
+  address: '42 Gandhi Road, New Delhi',
+  openingHours: '11:00 AM - 11:00 PM',
   isOpen: true,
 };
 
-// Mock food items
+// Mock food items - Indian cuisine
 const mockFoodItems: FoodItemProps[] = [
   {
     id: '101',
-    name: 'Classic Cheeseburger',
-    description: 'Juicy beef patty with cheddar cheese, lettuce, tomato, and special sauce',
-    price: 9.99,
-    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1899',
+    name: 'Butter Chicken',
+    description: 'Tender chicken pieces in a rich, creamy tomato sauce with butter and spices',
+    price: 299.99,
+    image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=1770',
     isVeg: false,
-    category: 'burgers'
+    category: 'mains'
   },
   {
     id: '102',
-    name: 'Double Bacon Burger',
-    description: 'Two beef patties with bacon strips, cheese, pickles, and smoky BBQ sauce',
-    price: 12.99,
-    image: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?q=80&w=1776',
-    isVeg: false,
-    isSpicy: true,
-    category: 'burgers'
+    name: 'Paneer Tikka Masala',
+    description: 'Cottage cheese cubes marinated in yogurt and spices, grilled and served in a creamy tomato sauce',
+    price: 249.99,
+    image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1674',
+    isVeg: true,
+    category: 'mains'
   },
   {
     id: '103',
-    name: 'Veggie Supreme Burger',
-    description: 'Plant-based patty with fresh avocado, crisp lettuce, tomato, and vegan mayo',
-    price: 10.99,
-    image: 'https://images.unsplash.com/photo-1550950158-d0d960dff51b?q=80&w=1854',
-    isVeg: true,
-    category: 'burgers'
-  },
-  {
-    id: '201',
-    name: 'Crispy Fries',
-    description: 'Golden crispy fries seasoned with our special herb blend',
-    price: 3.99,
-    image: 'https://images.unsplash.com/photo-1576777645402-fbc0010c1254?q=80&w=1770',
-    isVeg: true,
-    category: 'sides'
-  },
-  {
-    id: '202',
-    name: 'Cheesy Bacon Fries',
-    description: 'Crispy fries topped with melted cheese and bacon bits',
-    price: 5.99,
-    image: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?q=80&w=1770',
+    name: 'Chicken Biryani',
+    description: 'Fragrant basmati rice cooked with tender chicken pieces, saffron, and aromatic spices',
+    price: 349.99,
+    image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=1974',
     isVeg: false,
-    category: 'sides'
+    isSpicy: true,
+    category: 'rice'
   },
   {
-    id: '301',
-    name: 'Chocolate Milkshake',
-    description: 'Creamy milkshake made with premium chocolate ice cream',
-    price: 4.99,
-    image: 'https://images.unsplash.com/photo-1578313611104-fa4d12dfc9fb?q=80&w=1770',
+    id: '104',
+    name: 'Masala Dosa',
+    description: 'Crispy rice pancake filled with spiced potatoes, served with sambar and chutney',
+    price: 179.99,
+    image: 'https://images.unsplash.com/photo-1630383249896-451678a8f433?q=80&w=1974',
     isVeg: true,
-    category: 'beverages'
+    category: 'breakfast'
+  },
+  {
+    id: '105',
+    name: 'Tandoori Roti',
+    description: 'Whole wheat flatbread baked in a clay oven',
+    price: 39.99,
+    image: 'https://images.unsplash.com/photo-1626082896492-766af4eb6501?q=80&w=1780',
+    isVeg: true,
+    category: 'breads'
+  },
+  {
+    id: '106',
+    name: 'Gulab Jamun',
+    description: 'Deep-fried milk solids soaked in rose-scented sugar syrup',
+    price: 99.99,
+    image: 'https://images.unsplash.com/photo-1615832494873-b0c52d519696?q=80&w=1974',
+    isVeg: true,
+    category: 'desserts'
   }
 ];
 
 // Categories
 const foodCategories = [
   { id: 'all', label: 'All' },
-  { id: 'burgers', label: 'Burgers' },
-  { id: 'sides', label: 'Sides' },
-  { id: 'beverages', label: 'Beverages' },
+  { id: 'mains', label: 'Main Courses' },
+  { id: 'rice', label: 'Rice & Biryani' },
+  { id: 'breads', label: 'Breads' },
+  { id: 'breakfast', label: 'Breakfast' },
+  { id: 'desserts', label: 'Desserts' },
 ];
 
 export default function RestaurantDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeCategory, setActiveCategory] = useState('all');
+  const [isScrolled, setIsScrolled] = useState(false);
   
   // Filter items based on active category
   const filteredItems = activeCategory === 'all' 
     ? mockFoodItems 
     : mockFoodItems.filter(item => item.category === activeCategory);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -110,12 +126,12 @@ export default function RestaurantDetail() {
           alt={mockRestaurant.name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/10"></div>
       </div>
       
       {/* Restaurant Info */}
       <div className="container px-4">
-        <div className="bg-white rounded-lg shadow-sm p-6 -mt-16 relative z-10">
+        <div className={`bg-white rounded-lg shadow-lg p-6 -mt-16 relative z-10 transition-all duration-300 ${isScrolled ? 'animate-scale-in' : ''}`}>
           <div className="flex flex-col md:flex-row md:items-center">
             <div className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden mb-4 md:mb-0 md:mr-6">
               <img 
@@ -176,9 +192,9 @@ export default function RestaurantDetail() {
         <h2 className="section-title">Menu</h2>
         
         <Tabs defaultValue="all" value={activeCategory} onValueChange={setActiveCategory}>
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 overflow-x-auto flex-nowrap">
             {foodCategories.map((category) => (
-              <TabsTrigger key={category.id} value={category.id}>
+              <TabsTrigger key={category.id} value={category.id} className="animate-fade-in">
                 {category.label}
               </TabsTrigger>
             ))}

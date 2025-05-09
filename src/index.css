@@ -118,4 +118,97 @@
   .section-title {
     @apply text-2xl md:text-3xl font-bold mb-4;
   }
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    @apply opacity-0 animate-[fadeIn_0.5s_forwards];
+  }
+  
+  .animate-scale-in {
+    @apply opacity-0 scale-95 animate-[scaleIn_0.3s_forwards];
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+  
+  .animate-pulse {
+    @apply animate-[pulse_2s_infinite];
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Food-specific colors */
+:root {
+  --food-vegetarian: #4CAF50;
+  --food-nonVegetarian: #E53935;
+  --brand: rgb(255, 92, 38);
+  --brand-dark: rgb(230, 81, 30);
+  --brand-light: rgb(255, 138, 99);
+}
+
+.text-food-vegetarian {
+  color: var(--food-vegetarian);
+}
+
+.bg-food-vegetarian {
+  background-color: var(--food-vegetarian);
+  color: white;
+}
+
+.text-food-nonVegetarian {
+  color: var(--food-nonVegetarian);
+}
+
+.bg-food-nonVegetarian {
+  background-color: var(--food-nonVegetarian);
+  color: white;
+}
+
+.text-brand {
+  color: var(--brand);
+}
+
+.bg-brand {
+  background-color: var(--brand);
+  color: white;
+}
+
+.bg-brand-dark {
+  background-color: var(--brand-dark);
+  color: white;
+}
+
+.border-brand {
+  border-color: var(--brand);
 }

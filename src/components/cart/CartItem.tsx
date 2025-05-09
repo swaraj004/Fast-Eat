@@ -45,7 +45,7 @@ export function CartItem({
   };
   
   return (
-    <div className="flex py-4 border-b last:border-0">
+    <div className="flex py-4 border-b last:border-0 animate-fade-in">
       <div className="w-16 h-16">
         <img 
           src={item.image} 
@@ -59,11 +59,11 @@ export function CartItem({
           <div>
             <h3 className="font-medium">{item.name}</h3>
             <p className="text-sm text-muted-foreground">
-              ${item.price.toFixed(2)}
+              ₹{item.price.toFixed(2)}
             </p>
           </div>
           <div className="text-brand font-medium">
-            ${(item.price * item.quantity).toFixed(2)}
+            ₹{(item.price * item.quantity).toFixed(2)}
           </div>
         </div>
         

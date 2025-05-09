@@ -7,57 +7,68 @@ import { CartItem, CartItemProps } from '@/components/cart/CartItem';
 import { ArrowRight, CreditCard, Home, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Mock cart items
-const initialCartItems: CartItemProps[] = [
-  {
-    id: '101',
-    name: 'Classic Cheeseburger',
-    price: 9.99,
-    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=1899',
-    quantity: 1,
-    isVeg: false,
-  },
-  {
-    id: '202',
-    name: 'Cheesy Bacon Fries',
-    price: 5.99,
-    image: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?q=80&w=1770',
-    quantity: 1,
-    isVeg: false,
-  },
-  {
-    id: '301',
-    name: 'Chocolate Milkshake',
-    price: 4.99,
-    image: 'https://images.unsplash.com/photo-1578313611104-fa4d12dfc9fb?q=80&w=1770',
-    quantity: 1,
-    isVeg: true,
-  }
-];
-
 export default function Cart() {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState<CartItemProps[]>(initialCartItems);
+  const [cartItems, setCartItems] = useState<CartItemProps[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  useEffect(() => {
+    // Load cart items from localStorage
+    const loadCartItems = () => {
+      const cartData = localStorage.getItem('cart');
+      if (cartData) {
+        try {
+          const items = JSON.parse(cartData);
+          setCartItems(items);
+        } catch (error) {
+          console.error("Failed to parse cart data", error);
+          setCartItems([]);
+        }
+      }
+    };
+
+    loadCartItems();
+    
+    // Listen for cart updates
+    const handleCartUpdate = () => loadCartItems();
+    window.addEventListener('cart-updated', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('cart-updated', handleCartUpdate);
+    };
+  }, []);
   
   // Calculate subtotal, delivery fee, and total
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const deliveryFee = 2.99;
-  const serviceFee = 1.50;
+  const deliveryFee = 49.99;
+  const serviceFee = 29.50;
   const total = subtotal + deliveryFee + serviceFee;
   
   // Update item quantity
   const handleUpdateQuantity = (id: string, quantity: number) => {
-    setCartItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, quantity } : item
-      )
+    const updatedItems = cartItems.map(item => 
+      item.id === id ? { ...item, quantity } : item
     );
+    
+    setCartItems(updatedItems);
+    localStorage.setItem('cart', JSON.stringify(updatedItems));
+    
+    // Notify other components about the update
+    const cartCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
+    window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: cartCount } }));
   };
   
   // Remove item from cart
   const handleRemoveItem = (id: string) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+    const updatedItems = cartItems.filter(item => item.id !== id);
+    
+    setCartItems(updatedItems);
+    localStorage.setItem('cart', JSON.stringify(updatedItems));
+    
+    // Notify other components about the update
+    const cartCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
+    window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: cartCount } }));
+    
     toast.success("Item removed from cart");
   };
   
@@ -73,16 +84,25 @@ export default function Cart() {
     // Simulate API call
     setTimeout(() => {
       setIsProcessing(false);
-      navigate('/checkout');
+      
+      // Generate a random order ID
+      const orderId = Math.random().toString(36).substring(2, 10);
+      
+      // Clear cart
+      localStorage.removeItem('cart');
+      window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: 0 } }));
+      
+      // Redirect to order tracking page
+      navigate(`/track/${orderId}`);
     }, 1000);
   };
   
   return (
-    <div className="container px-4 py-8">
+    <div className="container px-4 py-8 animate-fade-in">
       <h1 className="text-2xl md:text-3xl font-bold mb-6">Your Cart</h1>
       
       {cartItems.length === 0 ? (
-        <div className="bg-white rounded-lg p-8 text-center">
+        <div className="bg-white rounded-lg p-8 text-center shadow-lg">
           <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-muted mb-4">
             <ShoppingBag className="h-8 w-8 text-muted-foreground" />
           </div>
@@ -91,8 +111,8 @@ export default function Cart() {
             Add some delicious items from our restaurants and get them delivered to you.
           </p>
           <Button 
-            className="bg-brand hover:bg-brand-dark"
-            onClick={() => navigate('/restaurants')}
+            className="bg-brand hover:bg-brand-dark animate-scale-in"
+            onClick={() => navigate('/')}
           >
             Browse Restaurants
           </Button>
@@ -101,9 +121,9 @@ export default function Cart() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-lg shadow-lg p-6">
               <h2 className="font-semibold text-lg mb-4">Cart Items</h2>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {cartItems.map((item) => (
                   <CartItem 
                     key={item.id} 
@@ -118,21 +138,21 @@ export default function Cart() {
           
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-lg shadow-lg p-6 sticky top-4">
               <h2 className="font-semibold text-lg mb-4">Order Summary</h2>
               
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Delivery Fee</span>
-                  <span>${deliveryFee.toFixed(2)}</span>
+                  <span>₹{deliveryFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Service Fee</span>
-                  <span>${serviceFee.toFixed(2)}</span>
+                  <span>₹{serviceFee.toFixed(2)}</span>
                 </div>
               </div>
               
@@ -140,11 +160,11 @@ export default function Cart() {
               
               <div className="flex justify-between font-medium text-lg mb-6">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₹{total.toFixed(2)}</span>
               </div>
               
               <Button 
-                className="w-full bg-brand hover:bg-brand-dark"
+                className="w-full bg-brand hover:bg-brand-dark animate-pulse"
                 onClick={handleCheckout}
                 disabled={isProcessing || cartItems.length === 0}
               >

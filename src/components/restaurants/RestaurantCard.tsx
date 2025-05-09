@@ -18,16 +18,16 @@ export interface RestaurantProps {
 export function RestaurantCard({ restaurant }: { restaurant: RestaurantProps }) {
   return (
     <Link to={`/restaurant/${restaurant.id}`} className="block group">
-      <div className="food-card bg-white">
-        <div className="relative">
+      <div className="food-card bg-white hover:shadow-xl transition-all duration-300">
+        <div className="relative overflow-hidden">
           <img 
             src={restaurant.image} 
             alt={restaurant.name} 
-            className="w-full h-48 object-cover"
+            className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"
           />
           <div className="absolute top-2 right-2 flex flex-col gap-2">
             {restaurant.isVeg && (
-              <Badge className="bg-food-vegetarian">Pure Veg</Badge>
+              <Badge className="bg-food-vegetarian animate-fade-in">Pure Veg</Badge>
             )}
             <Badge className="bg-white text-foreground">
               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-1" />
