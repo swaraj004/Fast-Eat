@@ -6,7 +6,11 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Menu, ShoppingCart, User, Search } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-const Header = () => {
+interface HeaderProps {
+  cartCount?: number;
+}
+
+const Header = ({ cartCount = 0 }: HeaderProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -66,7 +70,7 @@ const Header = () => {
             <ShoppingCart className="h-5 w-5" />
             <span className="sr-only">Cart</span>
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-medium text-white">
-              0
+              {cartCount}
             </span>
           </Button>
 
