@@ -7,43 +7,43 @@ import { Badge } from '@/components/ui/badge';
 import { OrderTracker, OrderStatus } from '@/components/tracking/OrderTracker';
 import { MapPin, Package, Phone, User } from 'lucide-react';
 
-// Mock order data
+// Mock order data with Indian currency and food
 const mockOrder = {
   id: 'ORD123456',
   restaurant: {
-    name: 'Burger Palace',
+    name: 'Spice Garden',
     image: 'https://images.unsplash.com/photo-1586816001966-79b736744398?q=80&w=1470',
   },
   items: [
     {
       id: '101',
-      name: 'Classic Cheeseburger',
-      price: 9.99,
+      name: 'Butter Chicken',
+      price: 299.99,
       quantity: 1,
     },
     {
       id: '202',
-      name: 'Cheesy Bacon Fries',
-      price: 5.99,
+      name: 'Paneer Tikka',
+      price: 249.99,
       quantity: 1,
     },
     {
       id: '301',
-      name: 'Chocolate Milkshake',
-      price: 4.99,
+      name: 'Masala Dosa',
+      price: 179.99,
       quantity: 1,
     }
   ],
-  subtotal: 20.97,
-  deliveryFee: 2.99,
-  serviceFee: 1.50,
-  total: 25.46,
+  subtotal: 729.97,
+  deliveryFee: 49.99,
+  serviceFee: 29.50,
+  total: 809.46,
   orderDate: '2023-05-09T14:30:00',
   estimatedDelivery: '2:55 PM',
   deliveryAddress: '123 Main Street, Apt 4B, Cityville',
   deliveryPerson: {
-    name: 'John Smith',
-    phone: '+1 (555) 123-4567',
+    name: 'Raj Kumar',
+    phone: '+91 98765 43210',
     image: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=1480',
   }
 };
@@ -58,6 +58,22 @@ export default function OrderTracking() {
     outForDelivery: false,
     delivered: false,
   });
+  const [cartItems, setCartItems] = useState([]);
+
+  // Fetch cart items from localStorage
+  useEffect(() => {
+    const cartData = localStorage.getItem('cart');
+    if (cartData) {
+      const parsedCart = JSON.parse(cartData);
+      setCartItems(parsedCart);
+      
+      // Update order items based on cart if available
+      if (parsedCart.length > 0) {
+        // In a real application, we would update the order from the server
+        console.log('Cart items loaded:', parsedCart.length);
+      }
+    }
+  }, []);
 
   // Simulate order status progression
   useEffect(() => {
@@ -177,7 +193,7 @@ export default function OrderTracking() {
                 {mockOrder.items.map(item => (
                   <div key={item.id} className="flex justify-between text-sm">
                     <span>{item.quantity}x {item.name}</span>
-                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -187,15 +203,15 @@ export default function OrderTracking() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${mockOrder.subtotal.toFixed(2)}</span>
+                  <span>₹{mockOrder.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Delivery Fee</span>
-                  <span>${mockOrder.deliveryFee.toFixed(2)}</span>
+                  <span>₹{mockOrder.deliveryFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Service Fee</span>
-                  <span>${mockOrder.serviceFee.toFixed(2)}</span>
+                  <span>₹{mockOrder.serviceFee.toFixed(2)}</span>
                 </div>
               </div>
               
@@ -203,7 +219,7 @@ export default function OrderTracking() {
               
               <div className="flex justify-between font-medium">
                 <span>Total</span>
-                <span>${mockOrder.total.toFixed(2)}</span>
+                <span>₹{mockOrder.total.toFixed(2)}</span>
               </div>
             </div>
             

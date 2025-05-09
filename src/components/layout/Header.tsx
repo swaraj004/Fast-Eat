@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -15,6 +15,7 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState<'customer' | 'seller' | null>(null);
+  const [localCartCount, setLocalCartCount] = useState(cartCount);
 
   // Mock login - in a real app, this would be authenticated
   const handleLoginClick = () => {
@@ -29,6 +30,31 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
       navigate('/seller/dashboard');
     }
   };
+
+  // Load cart count from local storage on initial render
+  useEffect(() => {
+    const loadCartCount = () => {
+      const cartData = localStorage.getItem('cart');
+      if (cartData) {
+        const cartItems = JSON.parse(cartData);
+        setLocalCartCount(cartItems.length);
+      }
+    };
+
+    // Load cart count initially
+    loadCartCount();
+
+    // Listen for cart update events
+    const handleCartUpdated = (event: CustomEvent) => {
+      setLocalCartCount(event.detail.count);
+    };
+
+    window.addEventListener('cart-updated', handleCartUpdated as EventListener);
+
+    return () => {
+      window.removeEventListener('cart-updated', handleCartUpdated as EventListener);
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -56,7 +82,7 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" className="hidden md:flex">
+          <Button variant="outline" size="icon" className="hidden md:flex" onClick={() => navigate('/search')}>
             <Search className="h-4 w-4" />
             <span className="sr-only">Search</span>
           </Button>
@@ -70,7 +96,7 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
             <ShoppingCart className="h-5 w-5" />
             <span className="sr-only">Cart</span>
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-medium text-white">
-              {cartCount}
+              {localCartCount}
             </span>
           </Button>
 

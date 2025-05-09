@@ -8,6 +8,16 @@ import { Input } from '@/components/ui/input';
 import { Search, ArrowRight } from 'lucide-react';
 import { RestaurantCard, RestaurantProps } from '@/components/restaurants/RestaurantCard';
 
+// Mock food items for search functionality
+const mockFoodItems = [
+  { name: 'Butter Chicken', restaurant: '1' },
+  { name: 'Paneer Tikka', restaurant: '2' },
+  { name: 'Biryani', restaurant: '3' },
+  { name: 'Masala Dosa', restaurant: '4' },
+  { name: 'Tandoori Roti', restaurant: '1' },
+  { name: 'Gulab Jamun', restaurant: '2' }
+];
+
 // Mock data for restaurants - Adding Indian restaurants
 const mockRestaurants: RestaurantProps[] = [
   {
@@ -88,7 +98,7 @@ export default function Index() {
   const [filteredRestaurants, setFilteredRestaurants] = useState(mockRestaurants);
   const [heroLoaded, setHeroLoaded] = useState(false);
   
-  // Handle search functionality
+  // Enhanced search functionality for both restaurants and food items
   const handleSearch = () => {
     if (!searchQuery.trim()) {
       setFilteredRestaurants(mockRestaurants);
@@ -96,6 +106,29 @@ export default function Index() {
     }
     
     const query = searchQuery.toLowerCase();
+    
+    // First, check if the query matches any food item names
+    const matchingFoodItems = mockFoodItems.filter(item => 
+      item.name.toLowerCase().includes(query)
+    );
+    
+    if (matchingFoodItems.length > 0) {
+      // If food items match, show restaurants that have these items
+      const restaurantIdsWithMatchingFood = matchingFoodItems.map(item => item.restaurant);
+      const restaurantsWithMatchingFood = mockRestaurants.filter(restaurant => 
+        restaurantIdsWithMatchingFood.includes(restaurant.id)
+      );
+      
+      setFilteredRestaurants(restaurantsWithMatchingFood);
+      
+      // Display toast notification
+      if (restaurantsWithMatchingFood.length > 0) {
+        console.log(`Found ${restaurantsWithMatchingFood.length} restaurants serving ${searchQuery}`);
+      }
+      return;
+    }
+    
+    // If no food items match, fall back to restaurant search
     const results = mockRestaurants.filter(restaurant => 
       restaurant.name.toLowerCase().includes(query) || 
       restaurant.cuisine.some(c => c.toLowerCase().includes(query))
