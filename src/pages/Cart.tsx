@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,9 +5,12 @@ import { Separator } from '@/components/ui/separator';
 import { CartItem, CartItemProps } from '@/components/cart/CartItem';
 import { ArrowRight, CreditCard, Home, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { createOrder } from '@/services/orderService';
 
 export default function Cart() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState<CartItemProps[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -73,28 +75,62 @@ export default function Cart() {
   };
   
   // Process checkout
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
       return;
     }
     
+    if (!user) {
+      toast.error("Please login to place an order");
+      navigate('/login');
+      return;
+    }
+    
     setIsProcessing(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsProcessing(false);
+    try {
+      // Assume all items are from the same restaurant for simplicity
+      // In a real app, we would need to handle multiple restaurants
+      const restaurantId = "1"; // Mock restaurant ID
+      const restaurantName = "Spice Garden"; // Mock restaurant name
       
-      // Generate a random order ID
-      const orderId = Math.random().toString(36).substring(2, 10);
+      // Create order in database
+      const orderData = {
+        customer_id: user.id,
+        restaurant_id: restaurantId,
+        restaurant_name: restaurantName,
+        items: cartItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        })),
+        status: 'placed' as const,
+        total: total,
+        estimated_delivery: new Date(Date.now() + 45 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        delivery_address: "123 Main Street, Apt 4B, Cityville" // In a real app, this would come from the user's profile
+      };
+      
+      const { data, error } = await createOrder(orderData);
+      
+      if (error) {
+        throw error;
+      }
       
       // Clear cart
       localStorage.removeItem('cart');
       window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: 0 } }));
       
       // Redirect to order tracking page
-      navigate(`/track/${orderId}`);
-    }, 1000);
+      toast.success("Order placed successfully!");
+      navigate(`/track/${data.id}`);
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
   
   return (
