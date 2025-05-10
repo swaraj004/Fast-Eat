@@ -70,26 +70,26 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
 
   return (
     <header className={`sticky top-0 z-50 w-full border-b backdrop-blur transition-all duration-300 ${
-      scrolled ? 'bg-white/95 shadow-sm supports-[backdrop-filter]:bg-white/60' : 'bg-transparent border-transparent'
+      scrolled ? 'bg-white/95 shadow-sm supports-[backdrop-filter]:bg-white/60' : 'bg-white/80 border-transparent'
     }`}>
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <span className="text-xl font-bold">
               <span className="text-brand">Fast</span>
-              <span className={scrolled ? "text-black" : "text-white"}>Eat</span>
+              <span className="text-black">Eat</span>
             </span>
           </Link>
 
           {!isMobile && (
             <nav className="ml-10 hidden space-x-4 lg:flex">
-              <Link to="/" className={`text-sm font-medium transition-colors hover:text-brand ${scrolled ? '' : 'text-white'}`}>
+              <Link to="/" className="text-sm font-medium transition-colors hover:text-brand text-black">
                 Home
               </Link>
-              <Link to="/restaurants" className={`text-sm font-medium transition-colors hover:text-brand ${scrolled ? '' : 'text-white'}`}>
+              <Link to="/restaurants" className="text-sm font-medium transition-colors hover:text-brand text-black">
                 Restaurants
               </Link>
-              <Link to="/about" className={`text-sm font-medium transition-colors hover:text-brand ${scrolled ? '' : 'text-white'}`}>
+              <Link to="/about" className="text-sm font-medium transition-colors hover:text-brand text-black">
                 About
               </Link>
             </nav>
@@ -97,16 +97,16 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" className={`hidden md:flex ${scrolled ? 'bg-white' : 'bg-white/20 backdrop-blur'}`} onClick={() => navigate('/search')}>
+          <Button variant="outline" size="icon" className="hidden md:flex bg-white" onClick={() => navigate('/search')}>
             <Search className="h-4 w-4" />
             <span className="sr-only">Search</span>
           </Button>
           
           <Button 
-            variant={scrolled ? "ghost" : "outline"}
+            variant="ghost"
             size="icon"
             onClick={() => navigate('/cart')}
-            className={`relative ${scrolled ? '' : 'text-white bg-white/20 backdrop-blur hover:bg-white/30'}`}
+            className="relative text-black"
           >
             <ShoppingCart className="h-5 w-5" />
             <span className="sr-only">Cart</span>
@@ -120,7 +120,7 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
               Login
             </Button>
           ) : (
-            <Button variant={scrolled ? "ghost" : "outline"} size="icon" onClick={handleProfileClick} className={scrolled ? '' : 'text-white bg-white/20'}>
+            <Button variant="ghost" size="icon" onClick={handleProfileClick} className="text-black">
               <User className="h-5 w-5" />
               <span className="sr-only">Profile</span>
             </Button>
@@ -129,7 +129,7 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
           {isMobile && (
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant={scrolled ? "outline" : "outline"} size="icon" aria-label="Menu" className={scrolled ? '' : 'text-white bg-white/20 backdrop-blur'}>
+                <Button variant="outline" size="icon" aria-label="Menu" className="text-black bg-white">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>

@@ -203,11 +203,10 @@ export default function Index() {
               </p>
             </div>
             
-            <div className="relative max-w-md animate-scale-in perspective">
-              <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full opacity-70 blur-sm"></div>
+            <div className="relative max-w-md animate-scale-in">
               <Input
                 placeholder="Search for dishes or restaurants..."
-                className="pl-10 pr-4 h-12 rounded-full shadow-lg relative z-10 bg-white"
+                className="pl-10 pr-4 h-12 rounded-full shadow-md relative z-10 bg-white border-gray-200"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
