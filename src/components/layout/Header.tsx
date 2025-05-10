@@ -1,10 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Menu, ShoppingCart, User, Search } from 'lucide-react';
+import { Menu, ShoppingCart, User, Search, LogOut } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface HeaderProps {
   cartCount?: number;
@@ -13,12 +15,12 @@ interface HeaderProps {
 const Header = ({ cartCount = 0 }: HeaderProps) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userType, setUserType] = useState<'customer' | 'seller' | null>(null);
+  const location = useLocation();
+  const { user, userType, signOut } = useAuth();
   const [localCartCount, setLocalCartCount] = useState(cartCount);
   const [scrolled, setScrolled] = useState(false);
 
-  // Mock login - in a real app, this would be authenticated
+  // Handle login click
   const handleLoginClick = () => {
     navigate('/login');
   };
@@ -29,6 +31,22 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
       navigate('/customer/profile');
     } else if (userType === 'seller') {
       navigate('/seller/dashboard');
+    }
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Logged out successfully');
+      
+      // If on a restricted page, redirect to home
+      if (location.pathname.includes('/customer/') || 
+          location.pathname.includes('/seller/')) {
+        navigate('/');
+      }
+    } catch (error) {
+      toast.error('Failed to log out');
     }
   };
 
@@ -115,7 +133,7 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
             </span>
           </Button>
 
-          {!isLoggedIn ? (
+          {!user ? (
             <Button variant="default" onClick={handleLoginClick} className="bg-brand hover:bg-brand-dark text-black">
               Login
             </Button>
@@ -150,7 +168,7 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
                   <Link to="/about" className="text-lg font-medium transition-colors hover:text-brand">
                     About
                   </Link>
-                  {!isLoggedIn ? (
+                  {!user ? (
                     <>
                       <Link to="/login" className="text-lg font-medium transition-colors hover:text-brand">
                         Login
@@ -170,7 +188,10 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
                       <Link to="/orders" className="text-lg font-medium transition-colors hover:text-brand">
                         My Orders
                       </Link>
-                      <button className="text-lg font-medium text-left text-red-500 hover:text-red-700">
+                      <button 
+                        onClick={handleLogout}
+                        className="text-lg font-medium text-left text-red-500 hover:text-red-700"
+                      >
                         Logout
                       </button>
                     </>
@@ -178,6 +199,14 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
                 </nav>
               </SheetContent>
             </Sheet>
+          )}
+          
+          {/* Non-mobile logout button */}
+          {!isMobile && user && (
+            <Button variant="ghost" size="icon" onClick={handleLogout} className="text-black">
+              <LogOut className="h-5 w-5" />
+              <span className="sr-only">Logout</span>
+            </Button>
           )}
         </div>
       </div>

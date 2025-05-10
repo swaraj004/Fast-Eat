@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,10 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, user } = useAuth();
+  const { signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
   // Get user type from URL params or default to customer
@@ -24,15 +24,8 @@ export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
   });
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (user) {
-      // Redirect based on userType in auth context
-      navigate(userType === "seller" ? "/seller/dashboard" : "/");
-    }
-  }, [user, navigate, userType]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -46,12 +39,20 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // Validate form
+      // Form validation
       if (!formData.email || !formData.password) {
         throw new Error("Please fill in all fields");
       }
+      
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+      
+      if (formData.password.length < 6) {
+        throw new Error("Password must be at least 6 characters");
+      }
 
-      const { error } = await signIn(
+      const { error } = await signUp(
         formData.email,
         formData.password,
         userType
@@ -59,12 +60,16 @@ export default function Login() {
 
       if (error) throw error;
 
-      toast.success(`Login successful! Welcome back.`);
+      toast.success(`Signup successful! Welcome to FastEat.`);
       
       // Redirect based on user type
-      // Navigate will happen via the useEffect that watches for user changes
+      if (userType === "seller") {
+        navigate("/seller/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Login failed");
+      toast.error(error instanceof Error ? error.message : "Signup failed");
     } finally {
       setIsLoading(false);
     }
@@ -84,13 +89,13 @@ export default function Login() {
             <TabsTrigger value="seller">Restaurant Partner</TabsTrigger>
           </TabsList>
 
-          {/* Customer Login Form */}
+          {/* Customer Signup Form */}
           <TabsContent value="customer">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Customer Login</CardTitle>
+                <CardTitle className="text-2xl">Create Customer Account</CardTitle>
                 <CardDescription>
-                  Enter your email and password to access your account
+                  Sign up to order from your favorite restaurants
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleSubmit}>
@@ -108,21 +113,25 @@ export default function Login() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="customer-password">Password</Label>
-                      <Link
-                        to="/forgot-password"
-                        className="text-sm text-brand hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
+                    <Label htmlFor="customer-password">Password</Label>
                     <Input
                       id="customer-password"
                       name="password"
                       type="password"
                       placeholder="••••••••"
                       value={formData.password}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="customer-confirm-password">Confirm Password</Label>
+                    <Input
+                      id="customer-confirm-password"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
                       onChange={handleChange}
                       required
                     />
@@ -134,15 +143,15 @@ export default function Login() {
                     className="w-full bg-brand hover:bg-brand-dark"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Logging in..." : "Login"}
+                    {isLoading ? "Creating account..." : "Create account"}
                   </Button>
                   <p className="mt-4 text-center text-sm text-muted-foreground">
-                    Don't have an account?{" "}
+                    Already have an account?{" "}
                     <Link
-                      to="/signup?type=customer"
+                      to="/login"
                       className="text-brand hover:underline"
                     >
-                      Sign up
+                      Login
                     </Link>
                   </p>
                 </CardFooter>
@@ -150,19 +159,19 @@ export default function Login() {
             </Card>
           </TabsContent>
 
-          {/* Seller Login Form */}
+          {/* Seller Signup Form */}
           <TabsContent value="seller">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Restaurant Partner Login</CardTitle>
+                <CardTitle className="text-2xl">Register Restaurant</CardTitle>
                 <CardDescription>
-                  Access your restaurant dashboard to manage orders and menu
+                  Partner with FastEat to reach more customers
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="seller-email">Email</Label>
+                    <Label htmlFor="seller-email">Business Email</Label>
                     <Input
                       id="seller-email"
                       name="email"
@@ -174,21 +183,25 @@ export default function Login() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="seller-password">Password</Label>
-                      <Link
-                        to="/forgot-password"
-                        className="text-sm text-brand hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
+                    <Label htmlFor="seller-password">Password</Label>
                     <Input
                       id="seller-password"
                       name="password"
                       type="password"
                       placeholder="••••••••"
                       value={formData.password}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="seller-confirm-password">Confirm Password</Label>
+                    <Input
+                      id="seller-confirm-password"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
                       onChange={handleChange}
                       required
                     />
@@ -200,15 +213,15 @@ export default function Login() {
                     className="w-full bg-brand hover:bg-brand-dark"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Logging in..." : "Login"}
+                    {isLoading ? "Creating account..." : "Register restaurant"}
                   </Button>
                   <p className="mt-4 text-center text-sm text-muted-foreground">
-                    Want to register your restaurant?{" "}
+                    Already have an account?{" "}
                     <Link
-                      to="/signup?type=seller"
+                      to="/login"
                       className="text-brand hover:underline"
                     >
-                      Register here
+                      Login
                     </Link>
                   </p>
                 </CardFooter>
