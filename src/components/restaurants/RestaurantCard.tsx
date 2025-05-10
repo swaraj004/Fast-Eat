@@ -18,18 +18,18 @@ export interface RestaurantProps {
 export function RestaurantCard({ restaurant }: { restaurant: RestaurantProps }) {
   return (
     <Link to={`/restaurant/${restaurant.id}`} className="block group">
-      <div className="food-card bg-white hover:shadow-xl transition-all duration-300">
+      <div className="food-card bg-white hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden">
         <div className="relative overflow-hidden">
           <img 
             src={restaurant.image} 
             alt={restaurant.name} 
-            className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute top-2 right-2 flex flex-col gap-2">
             {restaurant.isVeg && (
               <Badge className="bg-food-vegetarian animate-fade-in">Pure Veg</Badge>
             )}
-            <Badge className="bg-white text-foreground">
+            <Badge className="bg-black text-white animate-fade-in">
               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-1" />
               <span>{restaurant.rating}</span>
             </Badge>
@@ -42,7 +42,7 @@ export function RestaurantCard({ restaurant }: { restaurant: RestaurantProps }) 
           <p className="text-muted-foreground text-sm mt-1">
             {restaurant.cuisine.join(', ')}
           </p>
-          <div className="flex items-center justify-between mt-2 text-sm">
+          <div className="flex items-center justify-between mt-3 text-sm">
             <div className="flex items-center text-muted-foreground">
               <Clock className="h-3 w-3 mr-1" />
               <span>{restaurant.deliveryTime}</span>

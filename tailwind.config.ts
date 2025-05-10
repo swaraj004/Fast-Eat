@@ -53,25 +53,25 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// Custom colors for our food delivery app
+				// Updated colors for yellow-black theme
 				brand: {
-					DEFAULT: '#FF642F',  // Vibrant orange as primary brand color
-					light: '#FF8F6B',
-					dark: '#E54D1B',
-					50: '#FFF2EE',
-					100: '#FFE5DB',
-					200: '#FFCBB7',
-					300: '#FFA987',
-					400: '#FF8761',
-					500: '#FF642F',
-					600: '#FF4A0B',
-					700: '#D63A00',
-					800: '#A32D00',
-					900: '#701F00',
+					DEFAULT: '#FFD700',  // Vibrant yellow as primary brand color
+					light: '#FFEB80',
+					dark: '#CCAC00',
+					50: '#FFFBEB',
+					100: '#FFF6D6',
+					200: '#FFECAD',
+					300: '#FFE27F',
+					400: '#FFD84C',
+					500: '#FFD700',
+					600: '#CCAC00',
+					700: '#998100',
+					800: '#665600',
+					900: '#332B00',
 				},
 				food: {
-					vegetarian: '#4CAF50', // Green for vegetarian dishes
-					nonVegetarian: '#E53935', // Red for non-vegetarian dishes
+					vegetarian: '#4CAF50', // Keeping green for vegetarian dishes
+					nonVegetarian: '#000000', // Black for non-vegetarian dishes
 				}
 			},
 			borderRadius: {
@@ -103,6 +103,14 @@ export default {
 				'spin-slow': {
 					'0%': { transform: 'rotate(0deg)' },
 					'100%': { transform: 'rotate(360deg)' },
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
+				},
+				'scale-pulse': {
+					'0%, 100%': { transform: 'scale(1)' },
+					'50%': { transform: 'scale(1.05)' },
 				}
 			},
 			animation: {
@@ -110,6 +118,8 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 				'spin-slow': 'spin-slow 3s linear infinite',
+				'float': 'float 3s ease-in-out infinite',
+				'scale-pulse': 'scale-pulse 2s ease-in-out infinite',
 			}
 		}
 	},
