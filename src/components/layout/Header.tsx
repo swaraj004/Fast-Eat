@@ -62,7 +62,7 @@ const Header = ({ cartCount = 0 }: HeaderProps) => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <span className="text-xl font-bold text-brand">
-              Tasty<span className="text-foreground">Bite</span>
+              Fast<span className="text-foreground">Eat</span>
             </span>
           </Link>
 

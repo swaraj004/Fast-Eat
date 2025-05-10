@@ -17,6 +17,8 @@ import OrderTracking from "./pages/OrderTracking";
 import SellerDashboard from "./pages/seller/Dashboard";
 import MenuManagement from "./pages/seller/MenuManagement";
 import NotFound from "./pages/NotFound";
+import Restaurants from "./pages/Restaurants";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,8 @@ const App = () => (
             <Route path="/restaurant/:id" element={<RestaurantDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/track/:orderId" element={<OrderTracking />} />
+            <Route path="/restaurants" element={<Restaurants />} />
+            <Route path="/about" element={<About />} />
           </Route>
           
           {/* Seller Routes */}
